@@ -1,8 +1,9 @@
-import { DataGridPro } from '@mui/x-data-grid-pro'
+import { DataGridPro, GridOverlay } from '@mui/x-data-grid-pro'
 import React from 'react'
-import { useState } from 'react';
 import { createTheme } from '@mui/material/styles';
 import { createStyles, makeStyles } from '@mui/styles';
+import { LinearProgress } from '@mui/material';
+
 
 function customCheckbox(theme) {
     return {
@@ -100,20 +101,29 @@ const useStyles = makeStyles(
     { defaultTheme },
 );
 
-export default function Table({ columns, rows }) {
-    const [page, setPage] = useState(0);
+function CustomLoadingOverlay() {
+    return (
+        <GridOverlay>
+            <div style={{ position: 'absolute', top: 0, width: '100%' }}>
+                <LinearProgress />
+            </div>
+        </GridOverlay>
+    );
+}
+
+export default function Table({ columns, rows, onScroll }) {
     const classes = useStyles();
 
     return (
-        <div style={{ height: '910px', width: '100%', marginTop: '10px' }}>
+        <div onLoad={onScroll} style={{ height: '910px', width: '100%', marginTop: '10px' }}>
             <DataGridPro
                 className={classes.root}
-                page={page}
                 columns={columns}
                 rows={rows}
-                onPageChange={(newPage) => setPage(newPage)}
-                autoPageSize
-                pagination
+                onRowsScrollEnd={onScroll}
+                components={{
+                    LoadingOverlay: CustomLoadingOverlay,
+                }}
             />
         </div>
     )
